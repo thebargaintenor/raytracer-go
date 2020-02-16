@@ -1,5 +1,6 @@
 package engine
 
+// Color is an array of RGB values
 type Color [3]float64
 
 // R returns red channel

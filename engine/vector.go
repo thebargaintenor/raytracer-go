@@ -2,7 +2,7 @@ package engine
 
 import "math"
 
-// Vec3 is an array of 3 doubles
+// Vec3 is an array of XYZ coordinates
 type Vec3 [3]float64
 
 // X coordinate of vector
@@ -68,10 +68,9 @@ func (v Vec3) Dot(v2 Vec3) float64 {
 // Cross product of v, v2
 func (v Vec3) Cross(v2 Vec3) Vec3 {
 	return Vec3{
-		v[1] * v2[2] - v[2] * v2[1],
-		v[2] * v2[0] - v[0] * v2[2],
-		v[0] * v2[1] - v[1] * v2[0]
-	}
+		v[1]*v2[2] - v[2]*v2[1],
+		v[2]*v2[0] - v[0]*v2[2],
+		v[0]*v2[1] - v[1]*v2[0]}
 }
 
 // Will these be for somewhere else? 3D vectors don't really
