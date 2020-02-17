@@ -15,18 +15,36 @@ func createPpm() string {
 	yres := 100
 	ppm := fmt.Sprintf("P3\n%d %d\n255\n", xres, yres)
 
+	lowerLeftCorner := engine.Vec3{-2.0, -1.0, -1.0}
+	horizontal := engine.Vec3{4.0, 0.0, 0.0}
+	vertical := engine.Vec3{0.0, 2.0, 0.0}
+	origin := engine.Vec3{0.0, 0.0, 0.0}
+
 	for y := yres - 1; y >= 0; y-- {
 		for x := 0; x < xres; x++ {
-			rgb := engine.Color{
-				float64(x) / float64(xres),
-				float64(y) / float64(yres),
-				0.2}
+			u := float64(x) / float64(xres)
+			v := float64(y) / float64(yres)
+
+			ray := engine.Ray{
+				Origin:    origin,
+				Direction: (lowerLeftCorner.Add(horizontal.ScalarMult(u)).Add(vertical.ScalarMult(v)))}
+
+			rgb := rayColor(ray)
 
 			ppm += fmt.Sprintln(formatPpmPixel(rgb))
 		}
 	}
 
 	return ppm
+}
+
+func rayColor(r engine.Ray) engine.Color {
+	unitDirection := r.Direction.Unit()
+	t := 0.5 * (unitDirection.Y() + 1.0)
+	startColor := engine.Color{1.0, 1.0, 1.0}
+	endColor := engine.Color{0.5, 0.7, 1.0}
+	// linear interpolation being color stops
+	return startColor.ScalarMult(1.0 - t).Add(endColor.ScalarMult(t))
 }
 
 func formatPpmPixel(rgb engine.Color) string {
