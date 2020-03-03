@@ -39,6 +39,15 @@ func createPpm() string {
 }
 
 func rayColor(r engine.Ray) engine.Color {
+	sphere := engine.Sphere{
+		Center: engine.Vec3{0.0, 0.0, -1.0},
+		Radius: 0.5}
+
+	sphereColor, hit := sphere.Hit(&r)
+	if hit {
+		return *sphereColor
+	}
+
 	unitDirection := r.Direction.Unit()
 	t := 0.5 * (unitDirection.Y() + 1.0)
 	startColor := engine.Color{1.0, 1.0, 1.0}
