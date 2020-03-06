@@ -57,7 +57,7 @@ func (v Vec3) Add(v2 Vec3) Vec3 {
 
 // Sub returns difference (v - v2)
 func (v Vec3) Sub(v2 Vec3) Vec3 {
-	return Vec3{v[0] - v2[0], v[1] - v2[1], v[2] + v2[2]}
+	return Vec3{v[0] - v2[0], v[1] - v2[1], v[2] - v2[2]}
 }
 
 // Dot product of v, v2

@@ -29,7 +29,7 @@ func createPpm() string {
 				Origin:    origin,
 				Direction: (lowerLeftCorner.Add(horizontal.ScalarMult(u)).Add(vertical.ScalarMult(v)))}
 
-			rgb := rayColor(ray)
+			rgb := color(&ray)
 
 			ppm += fmt.Sprintln(formatPpmPixel(rgb))
 		}
@@ -38,16 +38,17 @@ func createPpm() string {
 	return ppm
 }
 
-func rayColor(r engine.Ray) engine.Color {
+func color(r *engine.Ray) engine.Color {
 	sphere := engine.Sphere{
 		Center: engine.Vec3{0.0, 0.0, -1.0},
 		Radius: 0.5}
 
-	sphereColor, hit := sphere.Hit(&r)
-	if hit {
-		return *sphereColor
+	hit, isHit := sphere.Hit(r, 0.0, 0.0)
+	if isHit {
+		return hit.Material
 	}
 
+	// scene background
 	unitDirection := r.Direction.Unit()
 	t := 0.5 * (unitDirection.Y() + 1.0)
 	startColor := engine.Color{1.0, 1.0, 1.0}

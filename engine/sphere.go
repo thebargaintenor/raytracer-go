@@ -1,21 +1,46 @@
 package engine
 
+import (
+	"math"
+)
+
 // Sphere is defined by center and radius
 type Sphere struct {
 	Center Vec3
 	Radius float64
+	Color  Color
 }
 
+// a bit odd of a convention, but forces the compiler to check
+// that the code that satisfies the interface exists somewhere
+var _ Hittable = &Sphere{}
+
 // Hit yields color where ray intersects sphere
-func (s Sphere) Hit(r *Ray) (*Color, bool) {
+func (s Sphere) Hit(r *Ray, tmin float64, tmax float64) (*Hit, bool) {
 	oc := r.Origin.Sub(s.Center)
 	a := r.Direction.Dot(r.Direction)
-	b := 2.0 * oc.Dot(r.Direction)
+	b := oc.Dot(r.Direction)
 	c := oc.Dot(oc) - s.Radius*s.Radius
-	discriminant := b*b - 4.0*a*c
+	discriminant := b*b - a*c
 
-	if discriminant > 0 {
-		return &Color{1.0, 0.0, 0.0}, true
+	if discriminant < 0.0 {
+		return nil, false
+	}
+
+	t := (-b - math.Sqrt(discriminant)) / a
+	if t < tmax && t > tmin {
+		location := r.PointAt(t)
+		normal := location.Sub(s.Center).Unit()
+		color := Color{
+			normal.X() + 1.0,
+			normal.Y() + 1.0,
+			normal.Z() + 1.0}.ScalarMult(0.5)
+
+		return &Hit{
+			T:        t,
+			Point:    location,
+			Normal:   normal,
+			Material: color}, true
 	}
 
 	return nil, false
