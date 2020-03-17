@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/thebargaintenor/raytracer-go/engine"
 )
@@ -20,6 +21,15 @@ func createPpm() string {
 	vertical := engine.Vec3{0.0, 2.0, 0.0}
 	origin := engine.Vec3{0.0, 0.0, 0.0}
 
+	scene := engine.Scene{
+		engine.Sphere{
+			Center: engine.Vec3{0.0, 0.0, -1.0},
+			Radius: 0.5},
+		engine.Sphere{
+			Center: engine.Vec3{0.0, -100.5, -1.0},
+			Radius: 100.0},
+	}
+
 	for y := yres - 1; y >= 0; y-- {
 		for x := 0; x < xres; x++ {
 			u := float64(x) / float64(xres)
@@ -29,7 +39,7 @@ func createPpm() string {
 				Origin:    origin,
 				Direction: (lowerLeftCorner.Add(horizontal.ScalarMult(u)).Add(vertical.ScalarMult(v)))}
 
-			rgb := color(&ray)
+			rgb := color(&ray, &scene)
 
 			ppm += fmt.Sprintln(formatPpmPixel(rgb))
 		}
@@ -38,14 +48,13 @@ func createPpm() string {
 	return ppm
 }
 
-func color(r *engine.Ray) engine.Color {
-	sphere := engine.Sphere{
-		Center: engine.Vec3{0.0, 0.0, -1.0},
-		Radius: 0.5}
-
-	hit, isHit := sphere.Hit(r, 0.0, 0.0)
-	if isHit {
-		return hit.Material
+func color(r *engine.Ray, scene *engine.Scene) engine.Color {
+	if hit, success := scene.Hit(r, 0.0, math.MaxFloat64); success {
+		return engine.Color{
+			hit.Normal.X() + 1.0,
+			hit.Normal.Y() + 1.0,
+			hit.Normal.Z() + 1.0,
+		}.ScalarMult(0.5)
 	}
 
 	// scene background
@@ -62,5 +71,5 @@ func formatPpmPixel(rgb engine.Color) string {
 	g := uint8(255.99 * rgb[1])
 	b := uint8(255.99 * rgb[2])
 
-	return fmt.Sprintf("%d %d %d\n", r, g, b)
+	return fmt.Sprintf("%d %d %d", r, g, b)
 }
