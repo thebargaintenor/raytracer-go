@@ -21,3 +21,8 @@ func RandomInUnitSphere() Vec3 {
 		}
 	}
 }
+
+// Reflect a vector relative to plane normal
+func Reflect(vector, normal Vec3) Vec3 {
+	return vector.Sub(normal.ScalarMult(vector.Dot(normal) * 2))
+}

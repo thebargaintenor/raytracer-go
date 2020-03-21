@@ -6,9 +6,9 @@ import (
 
 // Sphere is defined by center and radius
 type Sphere struct {
-	Center Vec3
-	Radius float64
-	Color  Color
+	Center   Vec3
+	Radius   float64
+	Material Material
 }
 
 // a bit odd of a convention, but forces the compiler to check
@@ -29,19 +29,24 @@ func (s Sphere) Hit(r *Ray, tmin float64, tmax float64) (*Hit, bool) {
 
 	t := (-b - math.Sqrt(discriminant)) / a
 	if t < tmax && t > tmin {
-		location := r.PointAt(t)
-		normal := location.Sub(s.Center).Unit()
-		color := Color{
-			normal.X() + 1.0,
-			normal.Y() + 1.0,
-			normal.Z() + 1.0}.ScalarMult(0.5)
+		return s.createHitRecord(r, t), true
+	}
 
-		return &Hit{
-			T:        t,
-			Point:    location,
-			Normal:   normal,
-			Material: color}, true
+	t = (-b + math.Sqrt(discriminant)) / a
+	if t < tmax && t > tmin {
+		return s.createHitRecord(r, t), true
 	}
 
 	return nil, false
+}
+
+func (s Sphere) createHitRecord(r *Ray, t float64) *Hit {
+	location := r.PointAt(t)
+	normal := location.Sub(s.Center).Unit()
+
+	return &Hit{
+		T:        t,
+		Point:    location,
+		Normal:   normal,
+		Material: s.Material}
 }

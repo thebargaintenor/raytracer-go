@@ -5,7 +5,7 @@ type Hit struct {
 	T        float64
 	Point    Vec3
 	Normal   Vec3
-	Material Color
+	Material Material
 }
 
 // Hittable describes an object that implements ray collisions
