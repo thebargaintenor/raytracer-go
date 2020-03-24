@@ -14,24 +14,20 @@ func main() {
 
 func createPpm() string {
 	var (
-		xres            = 200
-		yres            = 100
-		samples         = 100
-		lowerLeftCorner = engine.Vec3{-2.0, -1.0, -1.0}
-		horizontal      = engine.Vec3{4.0, 0.0, 0.0}
-		vertical        = engine.Vec3{0.0, 2.0, 0.0}
-		origin          = engine.Vec3{0.0, 0.0, 0.0}
+		xres     = 200
+		yres     = 100
+		samples  = 100
+		lookFrom = engine.Vec3{-2.0, 2.0, 1.0}
+		lookAt   = engine.Vec3{0.0, 0.0, -1.0}
+		vup      = engine.Vec3{0.0, 1.0, 0.0}
+		fov      = 20.0
+		aspect   = float64(xres) / float64(yres)
 	)
 
 	ppm := fmt.Sprintf("P3\n%d %d\n255\n", xres, yres)
 
 	world := createWorld()
-	camera := engine.Camera{
-		BottomLeft: lowerLeftCorner,
-		Horizontal: horizontal,
-		Vertical:   vertical,
-		Origin:     origin,
-	}
+	camera := engine.CreateCamera(lookFrom, lookAt, vup, fov, aspect)
 
 	c := engine.Color{0.0, 0.0, 0.0}
 	for y := yres - 1; y >= 0; y-- {
@@ -60,7 +56,7 @@ func createWorld() *engine.Scene {
 		engine.Sphere{
 			Center:   engine.Vec3{0.0, 0.0, -1.0},
 			Radius:   0.5,
-			Material: engine.Lambertian{Albedo: &engine.Color{0.8, 0.3, 0.3}},
+			Material: engine.Lambertian{Albedo: &engine.Color{0.3, 0.3, 0.8}},
 		},
 		engine.Sphere{
 			Center:   engine.Vec3{0.0, -100.5, -1.0},
