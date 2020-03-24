@@ -68,14 +68,22 @@ func createWorld() *engine.Scene {
 			Material: engine.Lambertian{Albedo: &engine.Color{0.8, 0.8, 0.0}},
 		},
 		engine.Sphere{
-			Center:   engine.Vec3{1.0, 0.0, -1.0},
-			Radius:   0.5,
-			Material: engine.Metal{Albedo: &engine.Color{0.8, 0.6, 0.2}},
+			Center: engine.Vec3{1.0, 0.0, -1.0},
+			Radius: 0.5,
+			Material: engine.Metal{
+				Albedo:    &engine.Color{0.8, 0.6, 0.2},
+				Fuzziness: 1.0,
+			},
 		},
 		engine.Sphere{
 			Center:   engine.Vec3{-1.0, 0.0, -1.0},
 			Radius:   0.5,
-			Material: engine.Metal{Albedo: &engine.Color{0.8, 0.8, 0.8}},
+			Material: engine.Dielectric{RefractiveIndex: 1.5},
+		},
+		engine.Sphere{
+			Center:   engine.Vec3{-1.0, 0.0, -1.0},
+			Radius:   -0.45,
+			Material: engine.Dielectric{RefractiveIndex: 1.5},
 		},
 	)
 

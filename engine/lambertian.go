@@ -9,7 +9,7 @@ type Lambertian struct {
 var _ Material = &Lambertian{}
 
 // Scatter describes ray interacting with a diffuse material
-func (l Lambertian) Scatter(r *Ray, h *Hit) (*Color, *Ray, bool) {
+func (l Lambertian) Scatter(incident *Ray, h *Hit) (*Color, *Ray, bool) {
 	target := h.Point.Add(h.Normal).Add(RandomInUnitSphere())
 	scattered := Ray{
 		Origin:    h.Point,

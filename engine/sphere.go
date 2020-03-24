@@ -42,7 +42,7 @@ func (s Sphere) Hit(r *Ray, tmin float64, tmax float64) (*Hit, bool) {
 
 func (s Sphere) createHitRecord(r *Ray, t float64) *Hit {
 	location := r.PointAt(t)
-	normal := location.Sub(s.Center).Unit()
+	normal := location.Sub(s.Center).ScalarDiv(s.Radius)
 
 	return &Hit{
 		T:        t,
