@@ -23,6 +23,19 @@ func RandomInUnitSphere() Vec3 {
 	}
 }
 
+// RandomInUnitDisk returns a random point within a unit circle about origin
+func RandomInUnitDisk() Vec3 {
+	for {
+		point := Vec3{rand.Float64(), rand.Float64(), 0.0}.
+			ScalarMult(2.0).
+			Sub(Vec3{1.0, 1.0, 0.0})
+
+		if point.Dot(point) < 1.0 {
+			return point
+		}
+	}
+}
+
 // Reflect a vector relative to plane normal
 func Reflect(vector, normal Vec3) Vec3 {
 	return vector.Sub(normal.ScalarMult(vector.Dot(normal) * 2))

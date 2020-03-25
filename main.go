@@ -14,20 +14,22 @@ func main() {
 
 func createPpm() string {
 	var (
-		xres     = 200
-		yres     = 100
-		samples  = 100
-		lookFrom = engine.Vec3{-2.0, 2.0, 1.0}
-		lookAt   = engine.Vec3{0.0, 0.0, -1.0}
-		vup      = engine.Vec3{0.0, 1.0, 0.0}
-		fov      = 20.0
-		aspect   = float64(xres) / float64(yres)
+		xres          = 200
+		yres          = 100
+		samples       = 100
+		lookFrom      = engine.Vec3{3.0, 3.0, 2.0}
+		lookAt        = engine.Vec3{0.0, 0.0, -1.0}
+		vup           = engine.Vec3{0.0, 1.0, 0.0}
+		fov           = 20.0
+		aspect        = float64(xres) / float64(yres)
+		focusDistance = lookFrom.Sub(lookAt).Magnitude()
+		aperture      = 2.0
 	)
 
 	ppm := fmt.Sprintf("P3\n%d %d\n255\n", xres, yres)
 
 	world := createWorld()
-	camera := engine.CreateCamera(lookFrom, lookAt, vup, fov, aspect)
+	camera := engine.CreateCamera(lookFrom, lookAt, vup, fov, aspect, aperture, focusDistance)
 
 	c := engine.Color{0.0, 0.0, 0.0}
 	for y := yres - 1; y >= 0; y-- {
