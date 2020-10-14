@@ -47,7 +47,7 @@ func createPpm() string {
 		Scene:      world,
 	}
 
-	bitmap := renderSingleThread(renderContext)
+	bitmap := renderParallel(renderContext)
 
 	for _, c := range *bitmap.Data {
 		ppm += fmt.Sprintln(formatPpmPixel(c))

@@ -3,6 +3,8 @@ package main
 import (
 	"math"
 	"math/rand"
+	"sort"
+	"sync"
 
 	"github.com/thebargaintenor/raytracer-go/engine"
 )
@@ -21,6 +23,77 @@ type Bitmap struct {
 	Width  int
 	Height int
 	Data   *[]engine.Color
+}
+
+// PixelRenderContext contains context for concurrent rendering of individual pixel
+type PixelRenderContext struct {
+	Index   int
+	X       int
+	Y       int
+	Context *RenderContext
+}
+
+// RenderedPixel describes output for finished pixel render
+type RenderedPixel struct {
+	Index int
+	Color engine.Color
+}
+
+func renderParallel(context *RenderContext) *Bitmap {
+	pixelCount := context.Width * context.Height
+	results := make(chan *RenderedPixel, pixelCount)
+
+	var wg sync.WaitGroup
+	wg.Add(pixelCount)
+
+	idx := 0 // this should be independent because the scanlines are inverted for PPM
+	for y := context.Height - 1; y >= 0; y-- {
+		for x := 0; x < context.Width; x++ {
+			pixelContext := &PixelRenderContext{
+				Index:   idx,
+				X:       x,
+				Y:       y,
+				Context: context,
+			}
+
+			go renderPixelAsync(pixelContext, results, &wg)
+			idx++
+		}
+	}
+
+	go func() {
+		wg.Wait()
+		close(results)
+	}()
+
+	sortableResults := []*RenderedPixel{}
+	for result := range results {
+		sortableResults = append(sortableResults, result)
+	}
+
+	sort.Slice(sortableResults, func(i, j int) bool {
+		return sortableResults[i].Index < sortableResults[j].Index
+	})
+
+	data := []engine.Color{}
+	for _, result := range sortableResults {
+		data = append(data, result.Color)
+	}
+
+	return &Bitmap{
+		Width:  context.Width,
+		Height: context.Height,
+		Data:   &data,
+	}
+}
+
+func renderPixelAsync(job *PixelRenderContext, results chan<- *RenderedPixel, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	results <- &RenderedPixel{
+		Index: job.Index,
+		Color: getPixel(job.Context, job.X, job.Y),
+	}
 }
 
 func renderSingleThread(context *RenderContext) *Bitmap {
