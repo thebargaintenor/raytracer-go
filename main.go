@@ -17,8 +17,8 @@ func createPpm() string {
 		xres          = 300
 		yres          = 150
 		samples       = 100
-		lookFrom      = engine.Vec3{13.0, 3.0, 2.0}
-		lookAt        = engine.Vec3{0.0, 0.0, -1.0}
+		lookFrom      = engine.Vec3{13.0, 2.0, 3.0}
+		lookAt        = engine.Vec3{0.0, 0.0, 0.0}
 		vup           = engine.Vec3{0.0, 1.0, 0.0}
 		fov           = 30.0
 		aspect        = float64(xres) / float64(yres)

@@ -39,32 +39,45 @@ type RenderedPixel struct {
 	Color engine.Color
 }
 
+func worker(id int, wg *sync.WaitGroup, jobs <-chan *PixelRenderContext, results chan<- *RenderedPixel) {
+	for job := range jobs {
+		results <- &RenderedPixel{
+			Index: job.Index,
+			Color: getPixel(job.Context, job.X, job.Y),
+		}
+
+		wg.Done()
+	}
+}
+
 func renderParallel(context *RenderContext) *Bitmap {
 	pixelCount := context.Width * context.Height
+	jobs := make(chan *PixelRenderContext, pixelCount)
 	results := make(chan *RenderedPixel, pixelCount)
 
 	var wg sync.WaitGroup
 	wg.Add(pixelCount)
 
+	for w := 1; w <= 8; w++ {
+		go worker(w, &wg, jobs, results)
+	}
+
 	idx := 0 // this should be independent because the scanlines are inverted for PPM
 	for y := context.Height - 1; y >= 0; y-- {
 		for x := 0; x < context.Width; x++ {
-			pixelContext := &PixelRenderContext{
+			jobs <- &PixelRenderContext{
 				Index:   idx,
 				X:       x,
 				Y:       y,
 				Context: context,
 			}
-
-			go renderPixelAsync(pixelContext, results, &wg)
 			idx++
 		}
 	}
+	close(jobs)
 
-	go func() {
-		wg.Wait()
-		close(results)
-	}()
+	wg.Wait()
+	close(results)
 
 	sortableResults := []*RenderedPixel{}
 	for result := range results {
@@ -84,15 +97,6 @@ func renderParallel(context *RenderContext) *Bitmap {
 		Width:  context.Width,
 		Height: context.Height,
 		Data:   &data,
-	}
-}
-
-func renderPixelAsync(job *PixelRenderContext, results chan<- *RenderedPixel, wg *sync.WaitGroup) {
-	defer wg.Done()
-
-	results <- &RenderedPixel{
-		Index: job.Index,
-		Color: getPixel(job.Context, job.X, job.Y),
 	}
 }
 
