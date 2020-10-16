@@ -3,6 +3,7 @@ package main
 import (
 	"math"
 	"math/rand"
+	"runtime"
 	"sort"
 	"sync"
 
@@ -51,14 +52,17 @@ func worker(id int, wg *sync.WaitGroup, jobs <-chan *PixelRenderContext, results
 }
 
 func renderParallel(context *RenderContext) *Bitmap {
-	pixelCount := context.Width * context.Height
-	jobs := make(chan *PixelRenderContext, pixelCount)
-	results := make(chan *RenderedPixel, pixelCount)
+	var (
+		poolSize   = runtime.NumCPU()
+		pixelCount = context.Width * context.Height
+		jobs       = make(chan *PixelRenderContext, pixelCount)
+		results    = make(chan *RenderedPixel, pixelCount)
+	)
 
 	var wg sync.WaitGroup
 	wg.Add(pixelCount)
 
-	for w := 1; w <= 8; w++ {
+	for w := 1; w <= poolSize; w++ {
 		go worker(w, &wg, jobs, results)
 	}
 
