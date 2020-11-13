@@ -7,33 +7,24 @@ import (
 
 // RandomInUnitSphere returns a point within a unit sphere centered at origin
 func RandomInUnitSphere() Vec3 {
-	var point Vec3
-	// this concerns me because it only returns probabilistically
-	for {
-		// select point in unit cube about origin where each axis
-		// in (-1, 1)
-		point = Vec3{rand.Float64(), rand.Float64(), rand.Float64()}.
-			ScalarMult(2.0).
-			Sub(Vec3{1.0, 1.0, 1.0})
+	var (
+		rho   = rand.Float64()
+		theta = 2.0 * math.Pi * rand.Float64()
+		phi   = math.Pi * rand.Float64()
+		x     = rho * math.Sin(phi) * math.Cos(theta)
+		y     = rho * math.Sin(phi) * math.Sin(theta)
+		z     = rho * math.Cos(phi)
+	)
 
-		// point is in sphere if distance to center < 1
-		if point.SquareMagnitude() < 1.0 {
-			return point
-		}
-	}
+	return Vec3{x, y, z}
 }
 
-// RandomInUnitDisk returns a random point within a unit circle about origin
+// RandomInUnitDisk returns random point in unit circle about origin
 func RandomInUnitDisk() Vec3 {
-	for {
-		point := Vec3{rand.Float64(), rand.Float64(), 0.0}.
-			ScalarMult(2.0).
-			Sub(Vec3{1.0, 1.0, 0.0})
+	theta := 2.0 * math.Pi * rand.Float64()
+	r := rand.Float64()
 
-		if point.Dot(point) < 1.0 {
-			return point
-		}
-	}
+	return Vec3{r * math.Cos(theta), r * math.Sin(theta), 0.0}
 }
 
 // Reflect a vector relative to plane normal
