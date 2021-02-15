@@ -14,8 +14,8 @@ func main() {
 
 func createPpm() string {
 	var (
-		xres          = 300
-		yres          = 150
+		xres          = 640
+		yres          = 480
 		samples       = 100
 		lookFrom      = engine.Vec3{13.0, 2.0, 3.0}
 		lookAt        = engine.Vec3{0.0, 0.0, 0.0}

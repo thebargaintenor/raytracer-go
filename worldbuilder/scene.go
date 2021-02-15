@@ -126,7 +126,7 @@ func RandomScene() *engine.Scene {
 			Radius: 1.0,
 			Material: engine.Metal{
 				Albedo:    &engine.Color{0.7, 0.6, 0.5},
-				Fuzziness: 0.5,
+				Fuzziness: 0.05,
 			},
 		},
 	)
